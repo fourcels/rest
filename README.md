@@ -124,3 +124,12 @@ func hello() rest.Interactor {
 	})
 }
 ```
+
+## Use Case
+
+- Route Group
+
+```go
+admin := s.Group("/admin")
+admin.GET("/hello", hello())
+```
