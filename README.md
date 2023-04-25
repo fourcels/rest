@@ -72,6 +72,8 @@ Output data can be located in:
 
 ## Example
 
+[Advance Example](/examples/advance/main.go)
+
 ```go
 package main
 
@@ -123,13 +125,4 @@ func hello() rest.Interactor {
 		return nil
 	})
 }
-```
-
-## Use Case
-
-- Route Group
-
-```go
-admin := s.Group("/admin")
-admin.GET("/hello", hello())
 ```
