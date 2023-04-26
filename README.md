@@ -11,7 +11,7 @@ Inspired by [`swaggest/rest`](https://github.com/swaggest/rest)
   [`openapi-go`](https://github.com/swaggest/openapi-go).
 - Automatic request JSON schema validation with
   [`jsonschema-go`](https://github.com/swaggest/jsonschema-go),
-  [`gojsonschema`](https://github.com/xeipuuv/gojsonschema).
+  [`jsonschema`](https://github.com/santhosh-tekuri/jsonschema).
 - Embedded [Swagger UI](https://swagger.io/tools/swagger-ui/).
 
 ## Usage

@@ -1,34 +1,40 @@
 package rest
 
 import (
+	"encoding/json"
 	"net/http"
 	"reflect"
+	"strings"
 
+	gojsonschema "github.com/santhosh-tekuri/jsonschema/v5"
 	"github.com/swaggest/jsonschema-go"
-	"github.com/xeipuuv/gojsonschema"
 )
 
 type CustomValidator struct{}
 
 type ValidatorError struct {
 	HTTPCodeAsError
-	paramIn      ParamIn
-	ResultErrors []gojsonschema.ResultError
+	paramIn         ParamIn
+	ValidationError *gojsonschema.ValidationError
+}
+
+func (*ValidatorError) Error() string {
+	return "Validation Error"
 }
 
 func (ve *ValidatorError) Fields() map[string]any {
 	fields := make(map[string]any)
-	for _, re := range ve.ResultErrors {
-		fieldName := string(ve.paramIn) + ":" + re.Field()
+	for _, re := range ve.ValidationError.Causes {
+		fieldName := string(ve.paramIn) + ":" + strings.TrimLeft(re.InstanceLocation, "/")
 		if val, ok := fields[fieldName]; ok {
 			switch val := val.(type) {
 			case string:
-				fields[fieldName] = []string{val, re.Description()}
+				fields[fieldName] = []string{val, re.Message}
 			case []string:
-				fields[fieldName] = append(val, re.Description())
+				fields[fieldName] = append(val, re.Message)
 			}
 		} else {
-			fields[fieldName] = re.Description()
+			fields[fieldName] = re.Message
 		}
 	}
 	return fields
@@ -42,15 +48,11 @@ func (cv *CustomValidator) Validate(i any) error {
 		ParamInFormData,
 	}
 	for _, param := range params {
-		result, err := validate(i, string(param))
-		if err != nil {
-			return err
-		}
-		if !result.Valid() {
+		if err := validate(i, string(param)); err != nil {
 			return &ValidatorError{
 				http.StatusBadRequest,
 				param,
-				result.Errors(),
+				err.(*gojsonschema.ValidationError),
 			}
 		}
 	}
@@ -58,13 +60,26 @@ func (cv *CustomValidator) Validate(i any) error {
 	return nil
 }
 
-func validate(i any, param string) (*gojsonschema.Result, error) {
+func validate(i any, param string) error {
 	reflector := jsonschema.Reflector{}
 	schema, _ := reflector.Reflect(i, jsonschema.PropertyNameTag(param))
 	j, _ := schema.JSONSchemaBytes()
-	schemaLoader := gojsonschema.NewStringLoader(string(j))
-	documentLoader := gojsonschema.NewGoLoader(structToMap(i, param))
-	return gojsonschema.Validate(schemaLoader, documentLoader)
+	schemaLoader := gojsonschema.MustCompileString("schema.json", string(j))
+	v, err := decodeMap(structToMap(i, param))
+	if err != nil {
+		return err
+	}
+	return schemaLoader.Validate(v)
+}
+
+func decodeMap(i map[string]any) (map[string]any, error) {
+	b, err := json.Marshal(i)
+	if err != nil {
+		return nil, err
+	}
+	var v map[string]any
+	json.Unmarshal(b, &v)
+	return v, nil
 }
 
 func structToMap(item any, tagName string) map[string]any {
@@ -92,11 +107,7 @@ func structToMap(item any, tagName string) map[string]any {
 			continue
 		}
 		if tag != "" && tag != "-" {
-			if field.Type.Kind() == reflect.Struct {
-				res[tag] = structToMap(fieldVal, tagName)
-			} else {
-				res[tag] = fieldVal
-			}
+			res[tag] = fieldVal
 		}
 	}
 	return res
