@@ -67,7 +67,7 @@ func (g *Group) add(method, pattern string, h Interactor, middleware ...echo.Mid
 	g.reflector.SetRequest(operation, h.Input(), method)
 	g.reflector.SetJSONResponse(operation, h.Output(), http.StatusOK)
 	for _, op := range append(g.ops, h.Options()...) {
-		op(operation)
+		op(operation, g.reflector)
 	}
 	path := pathColonToParentheses(g.prefix + pattern)
 	if err := g.reflector.Spec.AddOperation(method, path, *operation); err != nil {

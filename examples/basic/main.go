@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	s := rest.DefaultService()
+	s := rest.NewService()
 	s.OpenAPI.Info.WithTitle("Basic Example")
 	s.GET("/hello/:name", hello())
 

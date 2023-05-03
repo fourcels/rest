@@ -39,7 +39,7 @@ func customHTTPErrorHandler(err error, c echo.Context) {
 	}
 }
 
-func DefaultService(ops ...option) *Service {
+func NewService(ops ...option) *Service {
 	s := &Service{}
 
 	s.reflector = &openapi3.Reflector{}
@@ -113,6 +113,12 @@ func (s *Service) WithSecurity(key string, securityScheme *openapi3.SecuritySche
 		})
 }
 
+func (s *Service) WithHttpBearerSecurity(key string) {
+	s.WithHttpSecurity(key, SchemeBearer)
+}
+func (s *Service) WithHttpBasicSecurity(key string) {
+	s.WithHttpSecurity(key, SchemeBasic)
+}
 func (s *Service) WithHttpSecurity(key string, scheme Scheme) {
 	s.WithSecurity(key, &openapi3.SecurityScheme{
 		HTTPSecurityScheme: &openapi3.HTTPSecurityScheme{

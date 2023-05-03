@@ -10,25 +10,21 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
-	"github.com/swaggest/openapi-go/openapi3"
 	"github.com/swaggest/swgui"
 )
 
 var signingKey = []byte("secret")
 
 func main() {
-	s := rest.DefaultService()
+	s := rest.NewService()
 	s.OpenAPI.Info.WithTitle("Advance Example")
-	s.WithHttpSecurity("bearerAuth", rest.SchemeBearer)
+	s.WithHttpBearerSecurity("bearerAuth")
+
 	s.POST("/login", login())
 	s.POST("/upload", upload())
 
-	admin := s.Group("/admin", func(op *openapi3.Operation) {
-		op.WithTags("Admin")
-		op.WithSecurity(map[string][]string{
-			"bearerAuth": {},
-		})
-	})
+	admin := s.Group("/admin", rest.WithTags("Admin"), rest.WithSecurity("bearerAuth"))
+
 	admin.Use(echojwt.JWT(signingKey))
 	admin.GET("/hello", hello())
 
@@ -92,10 +88,7 @@ func login() rest.Interactor {
 		}
 		out.Token = t
 		return nil
-	}, func(op *openapi3.Operation) {
-		op.WithSummary("Login")
-		op.WithTags("Auth")
-	})
+	}, rest.WithSummary("login"), rest.WithTags("Login"))
 }
 
 func hello() rest.Interactor {
@@ -105,8 +98,6 @@ func hello() rest.Interactor {
 		name := claims["name"].(string)
 		*out = "Welcome " + name + "!"
 		return nil
-	}, func(op *openapi3.Operation) {
-		op.WithSummary("Hello")
 	})
 }
 
@@ -124,7 +115,5 @@ func upload() rest.Interactor {
 	return rest.NewHandler(func(c echo.Context, in input, out *output) error {
 		out.Filename = in.File.Filename
 		return nil
-	}, func(op *openapi3.Operation) {
-		op.WithTags("Upload")
-	})
+	}, rest.WithTags("Upload"))
 }

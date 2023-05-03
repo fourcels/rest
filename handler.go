@@ -2,7 +2,6 @@ package rest
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/swaggest/openapi-go/openapi3"
 )
 
 type Interactor interface {
@@ -18,7 +17,6 @@ type Handler[i, o any] struct {
 }
 
 type interact[i, o any] func(c echo.Context, in i, out *o) error
-type option func(o *openapi3.Operation)
 
 func NewHandler[i, o any](handler interact[i, o], ops ...option) Interactor {
 	return &Handler[i, o]{
