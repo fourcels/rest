@@ -9,7 +9,6 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/labstack/echo-jwt/v4 v4.1.0
 	github.com/labstack/echo/v4 v4.10.2
-	github.com/swaggest/openapi-go v0.2.30
 	github.com/swaggest/swgui v1.6.2
 )
 
@@ -21,6 +20,7 @@ require (
 	github.com/mcuadros/go-defaults v1.2.0 // indirect
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.0 // indirect
 	github.com/swaggest/jsonschema-go v0.3.51 // indirect
+	github.com/swaggest/openapi-go v0.2.30 // indirect
 	github.com/swaggest/refl v1.1.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
