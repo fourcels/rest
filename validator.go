@@ -97,11 +97,15 @@ func structToMap(item any, tagName string) map[string]any {
 
 	for i := 0; i < typ.NumField(); i++ {
 		field := typ.Field(i)
+		structField := val.Field(i)
 		if field.Name == "_" {
 			continue
 		}
+		if !structField.CanInterface() {
+			continue
+		}
 		tag := field.Tag.Get(tagName)
-		fieldVal := val.Field(i).Interface()
+		fieldVal := structField.Interface()
 		if field.Anonymous && tag == "" {
 			res = mergeMaps(res, structToMap(fieldVal, tagName))
 			continue
