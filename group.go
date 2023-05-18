@@ -64,6 +64,7 @@ func pathColonToParentheses(pattern string) string {
 // Method adds routes for `basePattern` that matches the `method` HTTP method.
 func (g *Group) add(method, pattern string, h Interactor, middleware ...echo.MiddlewareFunc) *echo.Route {
 	operation := &openapi3.Operation{}
+	operation.WithSummary(h.Summary())
 	g.reflector.SetRequest(operation, h.Input(), method)
 	g.reflector.SetJSONResponse(operation, h.Output(), http.StatusOK)
 	for _, op := range append(g.ops, h.Options()...) {
