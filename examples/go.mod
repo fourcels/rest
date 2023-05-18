@@ -5,9 +5,9 @@ go 1.20
 replace github.com/fourcels/rest => ../
 
 require (
-	github.com/fourcels/rest v0.2.0
-	github.com/golang-jwt/jwt/v4 v4.5.0
-	github.com/labstack/echo-jwt/v4 v4.1.0
+	github.com/fourcels/rest v0.2.3
+	github.com/golang-jwt/jwt/v5 v5.0.0
+	github.com/labstack/echo-jwt/v4 v4.2.0
 	github.com/labstack/echo/v4 v4.10.2
 	github.com/swaggest/swgui v1.6.2
 )
@@ -24,9 +24,9 @@ require (
 	github.com/swaggest/refl v1.1.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	golang.org/x/crypto v0.8.0 // indirect
-	golang.org/x/net v0.9.0 // indirect
-	golang.org/x/sys v0.7.0 // indirect
+	golang.org/x/crypto v0.9.0 // indirect
+	golang.org/x/net v0.10.0 // indirect
+	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
