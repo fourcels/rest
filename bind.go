@@ -14,9 +14,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type CustomBinder struct {
-	echo.DefaultBinder
-}
+type CustomBinder struct{}
 
 // Bind implements the `Binder#Bind` function.
 // Binding is done in following order: 1) path params; 2) query params; 3) request body. Each step COULD override previous
@@ -42,6 +40,22 @@ func (b *CustomBinder) Bind(i interface{}, c echo.Context) (err error) {
 	}
 
 	return b.BindBody(c, i)
+}
+
+// BindHeaders binds HTTP headers to a bindable object
+func (b *CustomBinder) BindHeaders(c echo.Context, i interface{}) error {
+	if err := b.bindData(i, c.Request().Header, "header"); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error()).SetInternal(err)
+	}
+	return nil
+}
+
+// BindQueryParams binds query params to bindable object
+func (b *CustomBinder) BindQueryParams(c echo.Context, i interface{}) error {
+	if err := b.bindData(i, c.QueryParams(), "query"); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error()).SetInternal(err)
+	}
+	return nil
 }
 
 // BindBody binds request body contents to bindable object
@@ -190,6 +204,21 @@ func (b *CustomBinder) BindCookies(c echo.Context, i interface{}) error {
 	return nil
 }
 
+// get is an internal method and returns a map which satisfies conditions.
+func (b *CustomBinder) getMap(m map[string][]string, key string) (map[string]string, bool) {
+	dicts := make(map[string]string)
+	exist := false
+	for k, v := range m {
+		if i := strings.IndexByte(k, '['); i >= 1 && k[0:i] == key {
+			if j := strings.IndexByte(k[i+1:], ']'); j >= 1 {
+				exist = true
+				dicts[k[i+1:][:j]] = v[0]
+			}
+		}
+	}
+	return dicts, exist
+}
+
 // bindData will bind data ONLY fields in destination struct that have EXPLICIT tag
 func (b *CustomBinder) bindData(destination interface{}, data map[string][]string, tag string) error {
 	if destination == nil || len(data) == 0 {
@@ -242,6 +271,13 @@ func (b *CustomBinder) bindData(destination interface{}, data map[string][]strin
 				}
 			}
 			// does not have explicit tag and is not an ordinary struct - so move to next field
+			continue
+		}
+
+		if structFieldKind == reflect.Map &&
+			structField.Type().Elem().Kind() == reflect.String {
+			dists, _ := b.getMap(data, inputFieldName)
+			structField.Set(reflect.ValueOf(dists))
 			continue
 		}
 
