@@ -5,7 +5,7 @@ go 1.20
 replace github.com/fourcels/rest => ../
 
 require (
-	github.com/fourcels/rest v0.2.3
+	github.com/fourcels/rest v0.2.5
 	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/labstack/echo-jwt/v4 v4.2.0
 	github.com/labstack/echo/v4 v4.10.2
