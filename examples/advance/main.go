@@ -10,7 +10,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
-	"github.com/swaggest/swgui"
 )
 
 var signingKey = []byte("secret")
@@ -29,10 +28,8 @@ func main() {
 	admin.GET("/hello", hello())
 
 	// Swagger UI endpoint at /docs.
-	s.Docs("/docs", swgui.Config{
-		SettingsUI: map[string]string{
-			"persistAuthorization": "true",
-		},
+	s.Docs("/docs", map[string]any{
+		"persistAuthorization": true,
 	})
 
 	// Start server.

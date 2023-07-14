@@ -7,7 +7,6 @@ import (
 
 	"github.com/fourcels/rest"
 	"github.com/labstack/echo/v4"
-	"github.com/swaggest/swgui"
 )
 
 func main() {
@@ -16,7 +15,7 @@ func main() {
 	s.GET("/hello/:name", hello())
 
 	// Swagger UI endpoint at /docs.
-	s.Docs("/docs", swgui.Config{})
+	s.Docs("/docs")
 
 	// Start server.
 	log.Println("http://localhost:1323/docs")

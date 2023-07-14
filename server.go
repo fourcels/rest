@@ -1,15 +1,19 @@
 package rest
 
 import (
+	"bytes"
+	_ "embed"
+	"html/template"
 	"net/http"
 	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/swaggest/openapi-go/openapi3"
-	"github.com/swaggest/swgui"
-	"github.com/swaggest/swgui/v4cdn"
 )
+
+//go:embed swagger.tmpl
+var swagger string
 
 type Scheme string
 
@@ -90,7 +94,7 @@ func (s *Service) Group(prefix string, ops ...option) *Group {
 	return group
 }
 
-func (s *Service) Docs(pattern string, config swgui.Config) {
+func (s *Service) Docs(pattern string, config ...map[string]any) {
 	pattern = strings.TrimRight(pattern, "/")
 	s.Echo.GET(pattern+"/openapi.json", func(c echo.Context) error {
 		schema, err := s.OpenAPI.MarshalJSON()
@@ -100,10 +104,20 @@ func (s *Service) Docs(pattern string, config swgui.Config) {
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
 		return c.String(http.StatusOK, string(schema))
 	})
-	h := v4cdn.NewWithConfig(config)
-	s.Echo.Any(pattern+"*", echo.WrapHandler(
-		h(s.OpenAPI.Info.Title, pattern+"/openapi.json", pattern),
-	))
+	s.Echo.Any(pattern+"*", func(c echo.Context) error {
+		t := template.Must(template.New("swagger").Parse(swagger))
+		var html bytes.Buffer
+		var setting map[string]any
+		if len(config) > 0 {
+			setting = config[0]
+		}
+		t.Execute(&html, map[string]any{
+			"AssetBase":   "https://cdn.jsdelivr.net/npm/swagger-ui-dist",
+			"SwaggerJson": pattern + "/openapi.json",
+			"Setting":     setting,
+		})
+		return c.HTML(http.StatusOK, html.String())
+	})
 }
 
 func (s *Service) WithSecurity(key string, securityScheme *openapi3.SecurityScheme) {
