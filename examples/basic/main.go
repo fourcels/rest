@@ -12,7 +12,7 @@ import (
 func main() {
 	s := rest.NewService()
 	s.OpenAPI.Info.WithTitle("Basic Example")
-	s.GET("/hello/:name", hello())
+	s.GET("/hello/{name}", hello())
 
 	// Swagger UI endpoint at /docs.
 	s.Docs("/docs")

@@ -83,7 +83,7 @@ func (s *Service) DELETE(pattern string, h Interactor, middleware ...echo.Middle
 
 func (s *Service) Group(prefix string, ops ...option) *Group {
 	group := &Group{}
-	group.Group = s.Echo.Group(prefix)
+	group.Group = s.Echo.Group(parenthesesToColon(prefix))
 	group.reflector = s.reflector
 	group.prefix = prefix
 	group.ops = ops

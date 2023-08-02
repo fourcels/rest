@@ -56,9 +56,9 @@ func setupOutput(c echo.Context, out any) error {
 	return nil
 }
 
-func pathColonToParentheses(pattern string) string {
-	re := regexp.MustCompile(`:(\w+)`)
-	return re.ReplaceAllString(pattern, "{$1}")
+func parenthesesToColon(pattern string) string {
+	re := regexp.MustCompile(`\{(\w+)\}`)
+	return re.ReplaceAllString(pattern, ":$1")
 }
 
 // Method adds routes for `basePattern` that matches the `method` HTTP method.
@@ -70,12 +70,12 @@ func (g *Group) add(method, pattern string, h Interactor, middleware ...echo.Mid
 	for _, op := range append(g.ops, h.Options()...) {
 		op(operation, g.reflector)
 	}
-	path := pathColonToParentheses(g.prefix + pattern)
+	path := g.prefix + pattern
 	if err := g.reflector.Spec.AddOperation(method, path, *operation); err != nil {
 		log.Println(method, path, err)
 	}
 
-	return g.Add(method, pattern, func(c echo.Context) error {
+	return g.Add(method, parenthesesToColon(pattern), func(c echo.Context) error {
 		in := h.Input()
 		defaults.SetDefaults(in)
 		if err := c.Bind(in); err != nil {
@@ -112,7 +112,7 @@ func (g *Group) DELETE(pattern string, h Interactor, middleware ...echo.Middlewa
 
 func (g *Group) SubGroup(prefix string, ops ...option) *Group {
 	group := &Group{}
-	group.Group = g.Group.Group(prefix)
+	group.Group = g.Group.Group(parenthesesToColon(prefix))
 	group.reflector = g.reflector
 	group.prefix = g.prefix + prefix
 	group.ops = append(g.ops, ops...)
