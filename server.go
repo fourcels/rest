@@ -48,10 +48,6 @@ func NewService(ops ...option) *Service {
 
 	s.reflector = &openapi3.Reflector{}
 	s.OpenAPI = &openapi3.Spec{Openapi: "3.0.3"}
-	s.OpenAPI.Info.
-		WithTitle("Things API").
-		WithVersion("1.2.3").
-		WithDescription("API description")
 	s.reflector.Spec = s.OpenAPI
 	e := echo.New()
 	e.HideBanner = true
