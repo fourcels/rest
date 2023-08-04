@@ -101,6 +101,7 @@ func hello() rest.Interactor {
 func upload() rest.Interactor {
 	// Declare input port type.
 	type input struct {
+		Type uint                  `query:"type"`
 		File *multipart.FileHeader `formData:"file"`
 	}
 
