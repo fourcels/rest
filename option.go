@@ -3,32 +3,30 @@ package rest
 import (
 	"net/http"
 
-	"github.com/swaggest/openapi-go/openapi3"
+	"github.com/swaggest/openapi-go"
 )
 
-type option func(o *openapi3.Operation, reflect *openapi3.Reflector)
+type option func(oc openapi.OperationContext)
 
 func WithSummary(val string) option {
-	return func(op *openapi3.Operation, ref *openapi3.Reflector) {
-		op.WithSummary(val)
+	return func(oc openapi.OperationContext) {
+		oc.SetSummary(val)
 	}
 }
 
 func WithDescription(val string) option {
-	return func(op *openapi3.Operation, ref *openapi3.Reflector) {
-		op.WithDescription(val)
+	return func(oc openapi.OperationContext) {
+		oc.SetDescription(val)
 	}
 }
 func WithTags(val ...string) option {
-	return func(op *openapi3.Operation, ref *openapi3.Reflector) {
-		op.WithTags(val...)
+	return func(oc openapi.OperationContext) {
+		oc.SetTags(val...)
 	}
 }
 func WithSecurity(key string) option {
-	return func(op *openapi3.Operation, ref *openapi3.Reflector) {
-		op.WithSecurity(map[string][]string{
-			key: {},
-		})
-		ref.SetJSONResponse(op, new(ErrResponse), http.StatusUnauthorized)
+	return func(oc openapi.OperationContext) {
+		oc.AddSecurity(key)
+		oc.AddRespStructure(new(ErrResponse), openapi.WithHTTPStatus(http.StatusUnauthorized))
 	}
 }

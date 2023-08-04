@@ -63,15 +63,21 @@ func parenthesesToColon(pattern string) string {
 
 // Method adds routes for `basePattern` that matches the `method` HTTP method.
 func (g *Group) add(method, pattern string, h Interactor, middleware ...echo.MiddlewareFunc) *echo.Route {
-	operation := &openapi3.Operation{}
-	operation.WithSummary(h.Summary())
-	g.reflector.SetRequest(operation, h.Input(), method)
-	g.reflector.SetJSONResponse(operation, h.Output(), http.StatusOK)
-	for _, op := range append(g.ops, h.Options()...) {
-		op(operation, g.reflector)
-	}
 	path := g.prefix + pattern
-	if err := g.reflector.Spec.AddOperation(method, path, *operation); err != nil {
+	oc, err := g.reflector.NewOperationContext(method, path)
+	if err != nil {
+		log.Println(method, path, err)
+	}
+
+	for _, op := range append(g.ops, h.Options()...) {
+		op(oc)
+	}
+
+	oc.SetSummary(h.Summary())
+	oc.AddReqStructure(h.Input())
+	oc.AddRespStructure(h.Output())
+
+	if err := g.reflector.AddOperation(oc); err != nil {
 		log.Println(method, path, err)
 	}
 
@@ -108,13 +114,4 @@ func (g *Group) PUT(pattern string, h Interactor, middleware ...echo.MiddlewareF
 }
 func (g *Group) DELETE(pattern string, h Interactor, middleware ...echo.MiddlewareFunc) *echo.Route {
 	return g.add(http.MethodDelete, pattern, h, middleware...)
-}
-
-func (g *Group) SubGroup(prefix string, ops ...option) *Group {
-	group := &Group{}
-	group.Group = g.Group.Group(parenthesesToColon(prefix))
-	group.reflector = g.reflector
-	group.prefix = g.prefix + prefix
-	group.ops = append(g.ops, ops...)
-	return group
 }

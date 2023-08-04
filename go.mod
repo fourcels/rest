@@ -8,7 +8,7 @@ require (
 	github.com/mcuadros/go-defaults v1.2.0
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
 	github.com/swaggest/jsonschema-go v0.3.55
-	github.com/swaggest/openapi-go v0.2.36
+	github.com/swaggest/openapi-go v0.2.37
 )
 
 require (
