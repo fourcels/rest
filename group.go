@@ -13,6 +13,8 @@ import (
 	"github.com/swaggest/openapi-go/openapi3"
 )
 
+type NoContent struct{}
+
 type Group struct {
 	*echo.Group
 	prefix    string
@@ -95,6 +97,9 @@ func (g *Group) add(method, pattern string, h Interactor, middleware ...echo.Mid
 			return err
 		}
 		setupOutput(c, out)
+		if _, ok := out.(*NoContent); ok {
+			return c.NoContent(http.StatusNoContent)
+		}
 		return c.JSON(http.StatusOK, out)
 	}, middleware...)
 }

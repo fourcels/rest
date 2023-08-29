@@ -21,6 +21,7 @@ func main() {
 
 	s.POST("/login", login())
 	s.POST("/upload", upload())
+	s.GET("/empty", empty())
 
 	admin := s.Group("/admin", rest.WithTags("Admin"), rest.WithSecurity("bearerAuth"))
 
@@ -114,4 +115,10 @@ func upload() rest.Interactor {
 		out.Filename = in.File.Filename
 		return nil
 	}, rest.WithTags("Upload"))
+}
+
+func empty() rest.Interactor {
+	return rest.NewHandler(func(c echo.Context, in struct{}, out *rest.NoContent) error {
+		return nil
+	}, rest.WithTags("Empty"))
 }
