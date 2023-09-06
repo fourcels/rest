@@ -32,6 +32,7 @@
           SwaggerUIBundle.plugins.DownloadUrl
         ],
         layout: "StandaloneLayout",
+        defaultModelsExpandDepth: -1,
         {{- range $key, $value := .Setting}}
         {{$key}}: {{$value}},
         {{- end}}
