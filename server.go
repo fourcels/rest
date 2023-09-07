@@ -24,6 +24,7 @@ const (
 
 type Service struct {
 	*echo.Echo
+	baseUrl   string
 	group     *Group
 	reflector *openapi3.Reflector
 	OpenAPI   *openapi3.Spec
@@ -43,11 +44,18 @@ func customHTTPErrorHandler(err error, c echo.Context) {
 	}
 }
 
-func NewService(ops ...option) *Service {
+func NewService(baseUrl ...string) *Service {
 	s := &Service{}
 
 	s.reflector = &openapi3.Reflector{}
 	s.OpenAPI = &openapi3.Spec{Openapi: "3.0.3"}
+	if len(baseUrl) > 0 {
+		s.baseUrl = baseUrl[0]
+		s.OpenAPI.WithServers(openapi3.Server{
+			URL: s.baseUrl,
+		})
+	}
+
 	s.reflector.Spec = s.OpenAPI
 	e := echo.New()
 	e.HideBanner = true
@@ -60,7 +68,7 @@ func NewService(ops ...option) *Service {
 	e.Use(middleware.Recover())
 
 	s.Echo = e
-	s.group = s.Group("", ops...)
+	s.group = s.Group("")
 
 	return s
 }
@@ -83,7 +91,7 @@ func (s *Service) DELETE(pattern string, h Interactor, middleware ...echo.Middle
 
 func (s *Service) Group(prefix string, ops ...option) *Group {
 	group := &Group{}
-	group.Group = s.Echo.Group(parenthesesToColon(prefix))
+	group.Group = s.Echo.Group(s.baseUrl + parenthesesToColon(prefix))
 	group.reflector = s.reflector
 	group.prefix = prefix
 	group.ops = ops
@@ -92,7 +100,7 @@ func (s *Service) Group(prefix string, ops ...option) *Group {
 
 func (s *Service) Docs(pattern string, config ...map[string]any) {
 	pattern = strings.TrimRight(pattern, "/")
-	s.Echo.GET(pattern+"/openapi.json", func(c echo.Context) error {
+	s.Echo.GET(s.baseUrl+pattern+"/openapi.json", func(c echo.Context) error {
 		schema, err := s.OpenAPI.MarshalJSON()
 		if err != nil {
 			return err
@@ -100,7 +108,7 @@ func (s *Service) Docs(pattern string, config ...map[string]any) {
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
 		return c.String(http.StatusOK, string(schema))
 	})
-	s.Echo.Any(pattern+"*", func(c echo.Context) error {
+	s.Echo.Any(s.baseUrl+pattern+"*", func(c echo.Context) error {
 		t := template.Must(template.New("swagger").Parse(swagger))
 		var html bytes.Buffer
 		var setting map[string]any
@@ -109,7 +117,7 @@ func (s *Service) Docs(pattern string, config ...map[string]any) {
 		}
 		t.Execute(&html, map[string]any{
 			"AssetBase":   "https://cdn.jsdelivr.net/npm/swagger-ui-dist",
-			"SwaggerJson": pattern + "/openapi.json",
+			"SwaggerJson": s.baseUrl + pattern + "/openapi.json",
 			"Setting":     setting,
 		})
 		return c.HTML(http.StatusOK, html.String())

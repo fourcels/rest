@@ -15,7 +15,7 @@ import (
 var signingKey = []byte("secret")
 
 func main() {
-	s := rest.NewService()
+	s := rest.NewService("/api")
 	s.OpenAPI.Info.WithTitle("Advance Example")
 	s.WithHttpBearerSecurity("bearerAuth")
 
@@ -34,7 +34,7 @@ func main() {
 	})
 
 	// Start server.
-	log.Println("http://localhost:1323/docs")
+	log.Println("http://localhost:1323/api/docs")
 	s.Start(":1323")
 }
 
