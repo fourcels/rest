@@ -71,11 +71,12 @@ func (g *Group) add(method, pattern string, h Interactor, middleware ...echo.Mid
 		log.Println(method, path, err)
 	}
 
+	oc.SetSummary(h.Summary())
+
 	for _, op := range append(g.ops, h.Options()...) {
 		op(oc)
 	}
 
-	oc.SetSummary(h.Summary())
 	oc.AddReqStructure(h.Input())
 	oc.AddRespStructure(h.Output())
 
