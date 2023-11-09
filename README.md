@@ -2,16 +2,16 @@
 
 [![GoDevDoc](https://img.shields.io/badge/dev-doc-00ADD8?logo=go)](https://pkg.go.dev/github.com/fourcels/rest)
 
-Inspired by [`swaggest/rest`](https://github.com/swaggest/rest)
+Inspired by [swaggest/rest](https://github.com/swaggest/rest)
 
 ## Features
 
-- Built with [`echo`](https://github.com/labstack/echo).
+- Built with [echo](https://github.com/labstack/echo).
 - Automatic OpenAPI 3 documentation with
-  [`openapi-go`](https://github.com/swaggest/openapi-go).
+  [openapi-go](https://github.com/swaggest/openapi-go).
 - Automatic request JSON schema validation with
-  [`jsonschema-go`](https://github.com/swaggest/jsonschema-go),
-  [`jsonschema`](https://github.com/santhosh-tekuri/jsonschema).
+  [jsonschema-go](https://github.com/swaggest/jsonschema-go),
+  [jsonschema](https://github.com/santhosh-tekuri/jsonschema).
 - Embedded [Swagger UI](https://swagger.io/tools/swagger-ui/).
 
 ## Usage
