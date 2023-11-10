@@ -47,8 +47,9 @@ type jwtCustomClaims struct {
 func login() rest.Interactor {
 	// Declare input port type.
 	type input struct {
-		Username string `json:"username,omitempty" minLength:"3" default:"admin"`
-		Password string `json:"password,omitempty" minLength:"3" default:"a12345"`
+		Username  string `json:"username ,omitempty" minLength:"3"`
+		Password  string `json:"password,omitempty" minLength:"3" default:"a12345"`
+		Username2 string `json:"username2,omitempty"`
 	}
 
 	// Declare output port type.
