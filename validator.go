@@ -104,7 +104,7 @@ func structToMap(item any, tagName string) map[string]any {
 		if !structField.CanInterface() {
 			continue
 		}
-		tag := field.Tag.Get(tagName)
+		tag := strings.TrimSpace(strings.Split(field.Tag.Get(tagName), ",")[0])
 		fieldVal := structField.Interface()
 		if field.Anonymous && tag == "" {
 			res = mergeMaps(res, structToMap(fieldVal, tagName))
