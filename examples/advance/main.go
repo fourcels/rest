@@ -17,6 +17,7 @@ var signingKey = []byte("secret")
 func main() {
 	s := rest.NewService("/api")
 	s.OpenAPI.Info.WithTitle("Advance Example")
+	s.WithTags("Login", "Empty")
 	s.WithHttpBearerSecurity("bearerAuth")
 
 	s.POST("/login", login())

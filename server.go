@@ -152,3 +152,11 @@ func (s *Service) WithAPIKeySecurity(key, name string, in openapi3.APIKeySecurit
 		},
 	})
 }
+
+func (s *Service) WithTags(val ...string) {
+	tags := make([]openapi3.Tag, 0)
+	for _, v := range val {
+		tags = append(tags, openapi3.Tag{Name: v})
+	}
+	s.OpenAPI.WithTags(tags...)
+}
