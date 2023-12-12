@@ -3,7 +3,6 @@ module github.com/fourcels/rest
 go 1.20
 
 require (
-	github.com/fatih/camelcase v1.0.0
 	github.com/labstack/echo/v4 v4.11.3
 	github.com/mcuadros/go-defaults v1.2.0
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1

@@ -1,10 +1,10 @@
 package rest
 
 import (
+	"regexp"
 	"runtime"
 	"strings"
 
-	"github.com/fatih/camelcase"
 	"github.com/labstack/echo/v4"
 )
 
@@ -32,7 +32,14 @@ func getSummary() string {
 	}
 	name := strings.Split(runtime.FuncForPC(counter).Name(), ".")
 
-	return strings.Join(camelcase.Split(name[len(name)-1]), " ")
+	return camelRegexp(name[len(name)-1])
+}
+
+func camelRegexp(str string) string {
+	re := regexp.MustCompile(`([A-Z]+)`)
+	str = re.ReplaceAllString(str, ` $1`)
+	str = strings.Trim(str, " ")
+	return str
 }
 
 func NewHandler[i, o any](handler interact[i, o], ops ...option) Interactor {
