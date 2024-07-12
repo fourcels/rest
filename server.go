@@ -116,7 +116,7 @@ func (s *Service) Docs(pattern string, config ...map[string]any) {
 			setting = config[0]
 		}
 		t.Execute(&html, map[string]any{
-			"AssetBase":   "https://cdn.jsdelivr.net/npm/swagger-ui-dist",
+			"AssetBase":   "https://unpkg.com/swagger-ui-dist",
 			"SwaggerJson": s.baseUrl + pattern + "/openapi.json",
 			"Setting":     setting,
 		})
